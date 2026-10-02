@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Movie Date Night 🍿</title>
+  <meta name="description" content="You're invited to a cozy movie date night. Pick what we watch and when!" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍿</text></svg>" />
+
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    if (window.tailwind) tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            script: ['"Pacifico"', 'cursive'],
+            body: ['"Quicksand"', 'system-ui', 'sans-serif'],
+          },
+          colors: {
+            blush: { 100: '#ffe4ef', 200: '#ffc8de', 300: '#ff9fc4', 400: '#ff77ab', 500: '#f04f92' },
+            plum: { 700: '#4c1d63', 800: '#3a1350', 900: '#240a35', 950: '#16051f' },
+            glow: { 300: '#ffd7a1', 400: '#ffbf6e' },
+          },
+        },
+      },
+    };
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    html, body { background: #16051f; }
+    .bg-scene {
+      background:
+        radial-gradient(1200px 600px at 10% -10%, rgba(255, 159, 196, 0.35), transparent 60%),
+        radial-gradient(900px 600px at 110% 10%, rgba(255, 191, 110, 0.22), transparent 60%),
+        radial-gradient(900px 700px at 50% 120%, rgba(240, 79, 146, 0.35), transparent 60%),
+        linear-gradient(160deg, #240a35 0%, #3a1350 45%, #5b1d5e 75%, #7a2763 100%);
+    }
+
+    /* ---------- Keyframes ---------- */
+    @keyframes float {
+      0%, 100% { transform: translateY(0) rotate(var(--r, 0deg)); }
+      50%      { transform: translateY(-16px) rotate(calc(var(--r, 0deg) + 4deg)); }
+    }
+    @keyframes wiggle {
+      0%, 100% { transform: rotate(-8deg) scale(1); }
+      50%      { transform: rotate(8deg) scale(1.06); }
+    }
+    @keyframes pulse-heart {
+      0%, 100% { transform: scale(1); }
+      15%      { transform: scale(1.15); }
+      30%      { transform: scale(0.98); }
+      45%      { transform: scale(1.1); }
+    }
+    @keyframes twinkle {
+      0%, 100% { opacity: 0.25; transform: scale(0.8) rotate(0deg); }
+      50%      { opacity: 1;    transform: scale(1.15) rotate(20deg); }
+    }
+    @keyframes spin-slow { to { transform: rotate(360deg); } }
+    @keyframes glow-text {
+      0%, 100% { text-shadow: 0 0 12px rgba(255, 191, 110, 0.55), 0 0 32px rgba(255, 119, 171, 0.35); }
+      50%      { text-shadow: 0 0 20px rgba(255, 191, 110, 0.85), 0 0 48px rgba(255, 119, 171, 0.6); }
+    }
+    @keyframes heartbeat-btn {
+      0%, 100% { box-shadow: 0 10px 30px -8px rgba(240, 79, 146, 0.7), 0 0 0 0 rgba(255, 159, 196, 0.55); }
+      50%      { box-shadow: 0 14px 40px -6px rgba(240, 79, 146, 0.9), 0 0 0 10px rgba(255, 159, 196, 0); }
+    }
+    @keyframes rise {
+      0%   { transform: translate(0, 0) scale(0.6) rotate(0deg); opacity: 0; }
+      10%  { opacity: 1; }
+      100% { transform: translate(var(--dx), -110vh) scale(1.2) rotate(var(--rot)); opacity: 0; }
+    }
+    @keyframes pop-in {
+      0%   { transform: scale(0.85) translateY(12px); opacity: 0; }
+      100% { transform: scale(1) translateY(0); opacity: 1; }
+    }
+
+    .anim-float   { animation: float 6s ease-in-out infinite; }
+    .anim-wiggle  { animation: wiggle 3.2s ease-in-out infinite; }
+    .anim-pulse   { animation: pulse-heart 1.8s ease-in-out infinite; }
+    .anim-twinkle { animation: twinkle 2.6s ease-in-out infinite; }
+    .anim-spin    { animation: spin-slow 14s linear infinite; }
+    .glow-text    { animation: glow-text 4s ease-in-out infinite; }
+    .pop-in       { animation: pop-in 0.6s cubic-bezier(.2,.9,.3,1.3) both; }
+
+    .sticker { position: fixed; pointer-events: none; user-select: none; z-index: 0; filter: drop-shadow(0 8px 14px rgba(0,0,0,0.35)); }
+    .emoji-sticker { line-height: 1; }
+
+    /* ---------- Choice tiles ---------- */
+    .choice-input:checked + .choice-tile {
+      background: linear-gradient(135deg, rgba(255, 159, 196, 0.35), rgba(167, 94, 220, 0.3));
+      border-color: rgba(255, 200, 222, 0.95);
+      box-shadow: 0 0 0 3px rgba(255, 119, 171, 0.45), 0 12px 30px -10px rgba(240, 79, 146, 0.8);
+      transform: translateY(-2px);
+    }
+    .choice-input:checked + .choice-tile .check-dot { background: #ff77ab; border-color: #ffe4ef; }
+    .choice-input:checked + .choice-tile .check-dot::after { opacity: 1; transform: scale(1); }
+    .choice-input:focus-visible + .choice-tile { outline: 3px solid #ffbf6e; outline-offset: 3px; }
+    .check-dot::after {
+      content: ''; position: absolute; inset: 4px; border-radius: 9999px; background: #fff;
+      opacity: 0; transform: scale(0.4); transition: all .25s ease;
+    }
+
+    /* ---------- Reveal panels ---------- */
+    .reveal { display: grid; grid-template-rows: 0fr; opacity: 0; transition: grid-template-rows .4s ease, opacity .35s ease, margin .4s ease; margin-top: 0; }
+    .reveal > div { overflow: hidden; }
+    .reveal.open { grid-template-rows: 1fr; opacity: 1; margin-top: .6rem; }
+
+    /* ---------- Inputs ---------- */
+    .field {
+      width: 100%; border-radius: 1rem; padding: .8rem 1rem;
+      background: rgba(255, 255, 255, 0.92); color: #3a1350; font-weight: 600;
+      border: 2px solid transparent; outline: none; transition: border-color .2s, box-shadow .2s;
+    }
+    .field::placeholder { color: #b07aa1; font-weight: 500; }
+    .field:focus { border-color: #ff77ab; box-shadow: 0 0 0 4px rgba(255, 119, 171, 0.3); }
+    input[type="date"].field, input[type="time"].field { color-scheme: light; min-height: 3.1rem; }
+    input[type="date"]::-webkit-calendar-picker-indicator,
+    input[type="time"]::-webkit-calendar-picker-indicator { cursor: pointer; filter: invert(28%) sepia(60%) saturate(1500%) hue-rotate(300deg); }
+
+    .btn-love { animation: heartbeat-btn 1.8s ease-in-out infinite; }
+    .btn-love:hover { transform: translateY(-3px) scale(1.02); }
+    .btn-love:active { transform: translateY(0) scale(0.98); }
+
+    .burst { position: fixed; bottom: -40px; z-index: 60; pointer-events: none; animation: rise var(--dur) ease-out forwards; }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation: none !important; transition: none !important; }
+    }
+  </style>
+</head>
+
+<body class="min-h-screen font-body text-blush-100 antialiased overflow-x-hidden">
+
+  <!-- ============ Ambient glow blobs ============ -->
+  <div aria-hidden="true" class="bg-scene fixed inset-0 overflow-hidden pointer-events-none z-0">
+    <div class="absolute -top-24 -left-24 w-80 h-80 rounded-full bg-blush-400/30 blur-3xl"></div>
+    <div class="absolute top-1/3 -right-24 w-96 h-96 rounded-full bg-glow-400/20 blur-3xl"></div>
+    <div class="absolute -bottom-32 left-1/4 w-[28rem] h-[28rem] rounded-full bg-fuchsia-500/20 blur-3xl"></div>
+
+    <!-- twinkling stars -->
+    <span class="absolute top-[8%]  left-[30%] w-1.5 h-1.5 rounded-full bg-white anim-twinkle"></span>
+    <span class="absolute top-[18%] left-[70%] w-1 h-1 rounded-full bg-white anim-twinkle" style="animation-delay:.6s"></span>
+    <span class="absolute top-[42%] left-[6%]  w-1 h-1 rounded-full bg-glow-300 anim-twinkle" style="animation-delay:1.2s"></span>
+    <span class="absolute top-[60%] left-[92%] w-1.5 h-1.5 rounded-full bg-white anim-twinkle" style="animation-delay:.3s"></span>
+    <span class="absolute top-[78%] left-[14%] w-1 h-1 rounded-full bg-blush-200 anim-twinkle" style="animation-delay:1.8s"></span>
+    <span class="absolute top-[88%] left-[60%] w-1.5 h-1.5 rounded-full bg-white anim-twinkle" style="animation-delay:.9s"></span>
+    <span class="absolute top-[30%] left-[50%] w-1 h-1 rounded-full bg-glow-300 anim-twinkle" style="animation-delay:2.2s"></span>
+  </div>
+
+  <!-- ============ Floating stickers ============ -->
+  <div aria-hidden="true">
+    <!-- Heart (SVG) -->
+    <div class="sticker top-[6%] left-[4%] md:left-[8%] w-12 md:w-20 anim-float" style="--r:-12deg">
+      <svg viewBox="0 0 64 64" class="w-full anim-pulse">
+        <defs>
+          <linearGradient id="gHeart" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#ffb3d1"/><stop offset="1" stop-color="#f0287a"/>
+          </linearGradient>
+        </defs>
+        <path d="M32 56 C10 40 4 30 4 20 C4 11 11 5 19 5 C25 5 29 8 32 13 C35 8 39 5 45 5 C53 5 60 11 60 20 C60 30 54 40 32 56Z" fill="url(#gHeart)" stroke="#fff" stroke-width="3"/>
+        <ellipse cx="18" cy="17" rx="6" ry="4" fill="#fff" opacity=".6" transform="rotate(-30 18 17)"/>
+      </svg>
+    </div>
+
+    <!-- Popcorn box (SVG) -->
+    <div class="sticker hidden sm:block bottom-[6%] left-[3%] md:left-[7%] w-16 md:w-28 anim-float" style="--r:-8deg; animation-delay:-2s">
+      <svg viewBox="0 0 100 120">
+        <!-- popcorn -->
+        <g stroke="#e9b45f" stroke-width="1.5">
+          <circle cx="28" cy="34" r="12" fill="#fff6dc"/>
+          <circle cx="44" cy="24" r="13" fill="#fffaf0"/>
+          <circle cx="60" cy="26" r="12" fill="#fff3cf"/>
+          <circle cx="74" cy="36" r="11" fill="#fffaf0"/>
+          <circle cx="36" cy="40" r="10" fill="#fff3cf"/>
+          <circle cx="54" cy="38" r="11" fill="#fff6dc"/>
+          <circle cx="68" cy="44" r="9"  fill="#fff3cf"/>
+          <circle cx="22" cy="46" r="8"  fill="#fffaf0"/>
+        </g>
+        <!-- box -->
+        <path d="M14 48 H86 L76 114 H24 Z" fill="#fff" stroke="#fff" stroke-width="3" stroke-linejoin="round"/>
+        <path d="M14 48 H28 L32 114 H24 Z" fill="#ef3e6d"/>
+        <path d="M42 48 H58 L56 114 H44 Z" fill="#ef3e6d"/>
+        <path d="M72 48 H86 L76 114 H68 Z" fill="#ef3e6d"/>
+        <rect x="30" y="64" width="40" height="22" rx="6" fill="#ffd36e" stroke="#c23560" stroke-width="2"/>
+        <text x="50" y="80" text-anchor="middle" font-family="Pacifico, cursive" font-size="12" fill="#c23560">yum</text>
+        <!-- cute face -->
+        <circle cx="42" cy="96" r="2.4" fill="#4c1d63"/><circle cx="58" cy="96" r="2.4" fill="#4c1d63"/>
+        <path d="M46 101 Q50 105 54 101" stroke="#4c1d63" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <circle cx="37" cy="100" r="3" fill="#ff9fc4" opacity=".8"/><circle cx="63" cy="100" r="3" fill="#ff9fc4" opacity=".8"/>
+      </svg>
+    </div>
+
+    <!-- Cinema camera (SVG) -->
+    <div class="sticker top-[5%] right-[3%] md:right-[7%] w-16 md:w-28 anim-float" style="--r:10deg; animation-delay:-1s">
+      <svg viewBox="0 0 120 90">
+        <g class="origin-center">
+          <circle cx="36" cy="24" r="18" fill="#7b4bd1" stroke="#fff" stroke-width="3"/>
+          <circle cx="36" cy="24" r="6" fill="#fff"/>
+          <circle cx="36" cy="12" r="3" fill="#ffc8de"/><circle cx="46" cy="28" r="3" fill="#ffc8de"/><circle cx="26" cy="28" r="3" fill="#ffc8de"/>
+          <circle cx="72" cy="22" r="15" fill="#9a63e6" stroke="#fff" stroke-width="3"/>
+          <circle cx="72" cy="22" r="5" fill="#fff"/>
+          <circle cx="72" cy="12" r="2.5" fill="#ffc8de"/><circle cx="80" cy="26" r="2.5" fill="#ffc8de"/><circle cx="64" cy="26" r="2.5" fill="#ffc8de"/>
+        </g>
+        <rect x="16" y="40" width="70" height="40" rx="10" fill="#f04f92" stroke="#fff" stroke-width="3"/>
+        <path d="M86 52 L110 42 V78 L86 68 Z" fill="#ff9fc4" stroke="#fff" stroke-width="3" stroke-linejoin="round"/>
+        <circle cx="34" cy="60" r="3" fill="#3a1350"/><circle cx="56" cy="60" r="3" fill="#3a1350"/>
+        <path d="M40 66 Q45 71 50 66" stroke="#3a1350" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        <circle cx="28" cy="67" r="3.5" fill="#ffc8de" opacity=".9"/><circle cx="62" cy="67" r="3.5" fill="#ffc8de" opacity=".9"/>
+        <circle cx="76" cy="48" r="3" fill="#ffd36e"/>
+      </svg>
+    </div>
+
+    <!-- Movie ticket (SVG) -->
+    <div class="sticker hidden sm:block bottom-[8%] right-[3%] md:right-[8%] w-20 md:w-32 anim-float" style="--r:14deg; animation-delay:-3s">
+      <svg viewBox="0 0 140 70">
+        <path d="M8 6 H132 V24 A11 11 0 0 0 132 46 V64 H8 V46 A11 11 0 0 0 8 24 Z" fill="#ffd36e" stroke="#fff" stroke-width="3"/>
+        <line x1="100" y1="10" x2="100" y2="60" stroke="#c23560" stroke-width="2.5" stroke-dasharray="4 4"/>
+        <text x="54" y="32" text-anchor="middle" font-family="Pacifico, cursive" font-size="13" fill="#c23560">Admit</text>
+        <text x="54" y="52" text-anchor="middle" font-family="Quicksand, sans-serif" font-weight="700" font-size="13" fill="#4c1d63">TWO ♥</text>
+        <path d="M116 30 C110 25 108 22 108 19 C108 16 110 14 113 14 C115 14 116 15 116 17 C116 15 117 14 119 14 C122 14 124 16 124 19 C124 22 122 25 116 30Z" transform="translate(0 12)" fill="#f04f92"/>
+      </svg>
+    </div>
+
+    <!-- Sparkles (SVG) -->
+    <div class="sticker top-[38%] left-[2%] md:left-[18%] w-8 md:w-12 anim-twinkle" style="animation-delay:.4s">
+      <svg viewBox="0 0 40 40"><path d="M20 0 C22 13 27 18 40 20 C27 22 22 27 20 40 C18 27 13 22 0 20 C13 18 18 13 20 0Z" fill="#ffd36e"/></svg>
+    </div>
+    <div class="sticker top-[30%] right-[2%] md:right-[19%] w-6 md:w-9 anim-twinkle" style="animation-delay:1.3s">
+      <svg viewBox="0 0 40 40"><path d="M20 0 C22 13 27 18 40 20 C27 22 22 27 20 40 C18 27 13 22 0 20 C13 18 18 13 20 0Z" fill="#ffc8de"/></svg>
+    </div>
+    <div class="sticker hidden md:block bottom-[30%] right-[16%] w-10 anim-spin">
+      <svg viewBox="0 0 40 40"><path d="M20 0 C22 13 27 18 40 20 C27 22 22 27 20 40 C18 27 13 22 0 20 C13 18 18 13 20 0Z" fill="#fff" opacity=".85"/></svg>
+    </div>
+
+    <!-- Emoji stickers -->
+    <div class="sticker emoji-sticker hidden sm:block top-[52%] left-[4%] md:left-[10%] text-4xl md:text-6xl anim-wiggle" style="animation-delay:-.5s">🧸</div>
+    <div class="sticker emoji-sticker hidden sm:block top-[55%] right-[4%] md:right-[10%] text-4xl md:text-6xl anim-wiggle" style="animation-delay:-1.4s">🐰</div>
+    <div class="sticker emoji-sticker hidden md:block top-[20%] left-[20%] text-5xl anim-float" style="--r:-6deg; animation-delay:-2.5s">🐱</div>
+    <div class="sticker emoji-sticker hidden md:block bottom-[18%] left-[20%] text-4xl anim-float" style="animation-delay:-4s">💕</div>
+    <div class="sticker emoji-sticker hidden md:block top-[14%] right-[22%] text-4xl anim-twinkle" style="animation-delay:-1s">✨</div>
+    <div class="sticker emoji-sticker hidden lg:block bottom-[38%] left-[24%] text-4xl anim-wiggle" style="animation-delay:-2s">🍿</div>
+    <div class="sticker emoji-sticker hidden lg:block bottom-[14%] right-[24%] text-4xl anim-float" style="--r:8deg; animation-delay:-3.3s">🎬</div>
+  </div>
+
+  <!-- ============ Card ============ -->
+  <main class="relative z-10 min-h-screen flex items-center justify-center px-4 py-10 sm:py-16">
+    <div id="card" class="pop-in w-full max-w-xl rounded-[2rem] border border-white/20 bg-white/10 backdrop-blur-xl shadow-[0_30px_80px_-20px_rgba(240,79,146,0.55)] p-6 sm:p-9">
+
+      <!-- Invite view -->
+      <section id="invite-view">
+        <header class="text-center">
+          <div class="inline-flex items-center gap-2 rounded-full bg-white/15 border border-white/20 px-4 py-1 text-xs sm:text-sm font-semibold tracking-wide text-glow-300">
+            <span>✨</span> You're invited <span>✨</span>
+          </div>
+          <h1 class="mt-4 font-script text-4xl sm:text-5xl leading-tight text-glow-300 glow-text">
+            Movie Date Night
+          </h1>
+          <p class="mt-3 text-2xl" aria-hidden="true">🎬 🍿 💕</p>
+          <p class="mt-3 text-base sm:text-lg text-blush-100/90 font-medium">
+            Will you be my movie date? Pick what we watch, and when we do it ✨
+          </p>
+        </header>
+
+        <form id="invite-form" action="https://formspree.io/f/YOUR_FORM_ID" method="POST" class="mt-8 space-y-8" novalidate>
+          <!-- Formspree helpers -->
+          <input type="hidden" name="_subject" value="💌 New Movie Date Night answer!" />
+          <input type="hidden" name="final_choice" id="final_choice" value="" />
+          <input type="text" name="_gotcha" tabindex="-1" autocomplete="off" class="hidden" aria-hidden="true" />
+
+          <!-- Step 1: movie -->
+          <fieldset>
+            <legend class="flex items-center gap-2 text-lg sm:text-xl font-bold text-white">
+              <span class="grid place-items-center w-8 h-8 rounded-full bg-blush-400 text-plum-900 text-sm">1</span>
+              What are we watching?
+            </legend>
+
+            <div class="mt-4 grid gap-3">
+              <!-- Option 1 -->
+              <label class="block cursor-pointer">
+                <input class="choice-input sr-only" type="radio" name="movie_choice" value="Desperate Housewives" required />
+                <div class="choice-tile flex items-center gap-4 rounded-2xl border-2 border-white/20 bg-white/5 px-4 py-3.5 transition duration-200 hover:bg-white/10">
+                  <span class="text-3xl" aria-hidden="true">🏡</span>
+                  <span class="flex-1">
+                    <span class="block font-bold text-white">Desperate Housewives</span>
+                    <span class="block text-sm text-blush-200/90">Drama, gossip &amp; Wisteria Lane 💄</span>
+                  </span>
+                  <span class="check-dot relative w-6 h-6 shrink-0 rounded-full border-2 border-white/50 transition"></span>
+                </div>
+              </label>
+
+              <!-- Option 2 -->
+              <label class="block cursor-pointer">
+                <input class="choice-input sr-only" type="radio" name="movie_choice" value="Friends" />
+                <div class="choice-tile flex items-center gap-4 rounded-2xl border-2 border-white/20 bg-white/5 px-4 py-3.5 transition duration-200 hover:bg-white/10">
+                  <span class="text-3xl" aria-hidden="true">☕</span>
+                  <span class="flex-1">
+                    <span class="block font-bold text-white">Friends</span>
+                    <span class="block text-sm text-blush-200/90">Central Perk on the couch 🛋️</span>
+                  </span>
+                  <span class="check-dot relative w-6 h-6 shrink-0 rounded-full border-2 border-white/50 transition"></span>
+                </div>
+              </label>
+
+              <!-- Option 3 -->
+              <div>
+                <label class="block cursor-pointer">
+                  <input class="choice-input sr-only" type="radio" name="movie_choice" value="Your choice" data-reveal="reveal-yours" />
+                  <div class="choice-tile flex items-center gap-4 rounded-2xl border-2 border-white/20 bg-white/5 px-4 py-3.5 transition duration-200 hover:bg-white/10">
+                    <span class="text-3xl" aria-hidden="true">🙋‍♂️</span>
+                    <span class="flex-1">
+                      <span class="block font-bold text-white">Your choice</span>
+                      <span class="block text-sm text-blush-200/90">Surprise me with your pick 🎁</span>
+                    </span>
+                    <span class="check-dot relative w-6 h-6 shrink-0 rounded-full border-2 border-white/50 transition"></span>
+                  </div>
+                </label>
+                <div id="reveal-yours" class="reveal" aria-hidden="true">
+                  <div>
+                    <label for="your_choice_title" class="sr-only">Your movie pick</label>
+                    <input id="your_choice_title" name="your_choice_title" type="text" class="field" placeholder="Which movie should I pick? 🎥" disabled />
+                  </div>
+                </div>
+              </div>
+
+              <!-- Option 4 -->
+              <div>
+                <label class="block cursor-pointer">
+                  <input class="choice-input sr-only" type="radio" name="movie_choice" value="Her choice" data-reveal="reveal-hers" />
+                  <div class="choice-tile flex items-center gap-4 rounded-2xl border-2 border-white/20 bg-white/5 px-4 py-3.5 transition duration-200 hover:bg-white/10">
+                    <span class="text-3xl" aria-hidden="true">🙋‍♀️</span>
+                    <span class="flex-1">
+                      <span class="block font-bold text-white">Her choice</span>
+                      <span class="block text-sm text-blush-200/90">You pick, I bring the snacks 🍫</span>
+                    </span>
+                    <span class="check-dot relative w-6 h-6 shrink-0 rounded-full border-2 border-white/50 transition"></span>
+                  </div>
+                </label>
+                <div id="reveal-hers" class="reveal" aria-hidden="true">
+                  <div>
+                    <label for="her_choice_title" class="sr-only">Her movie pick</label>
+                    <input id="her_choice_title" name="her_choice_title" type="text" class="field" placeholder="Tell me what you'd like to watch 💖" disabled />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <p id="movie-error" class="hidden mt-3 text-sm font-semibold text-glow-300">Pick something to watch first 🥺</p>
+          </fieldset>
+
+          <!-- Step 2: date & plans -->
+          <fieldset>
+            <legend class="flex items-center gap-2 text-lg sm:text-xl font-bold text-white">
+              <span class="grid place-items-center w-8 h-8 rounded-full bg-blush-400 text-plum-900 text-sm">2</span>
+              When's our date? 📅
+            </legend>
+
+            <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label for="date_night_date" class="block mb-1.5 text-sm font-semibold text-blush-200">Pick a day</label>
+                <input id="date_night_date" name="date_night_date" type="date" class="field" required />
+              </div>
+              <div>
+                <label for="date_night_time" class="block mb-1.5 text-sm font-semibold text-blush-200">What time?</label>
+                <input id="date_night_time" name="date_night_time" type="time" class="field" value="20:00" required />
+              </div>
+            </div>
+
+            <div class="mt-3">
+              <label for="after_movie_plan" class="block mb-1.5 text-sm font-semibold text-blush-200">After the movie we…</label>
+              <select id="after_movie_plan" name="after_movie_plan" class="field cursor-pointer">
+                <option value="Dinner date 🍝">Dinner date 🍝</option>
+                <option value="Dessert run 🍰">Dessert run 🍰</option>
+                <option value="Cuddles &amp; snacks 🧸">Cuddles &amp; snacks 🧸</option>
+                <option value="Stargazing walk 🌙">Stargazing walk 🌙</option>
+                <option value="Surprise me ✨">Surprise me ✨</option>
+              </select>
+            </div>
+
+            <div class="mt-3">
+              <label for="message" class="block mb-1.5 text-sm font-semibold text-blush-200">Anything else? 💌</label>
+              <textarea id="message" name="message" rows="2" class="field resize-none" placeholder="Snack requests, dress code, sweet notes…"></textarea>
+            </div>
+
+            <p id="date-summary" class="mt-4 rounded-2xl bg-white/10 border border-white/15 px-4 py-3 text-center font-semibold text-glow-300 hidden"></p>
+            <p id="date-error" class="hidden mt-3 text-sm font-semibold text-glow-300">Choose a day and time for our date 🗓️</p>
+          </fieldset>
+
+          <!-- Status + submit -->
+          <div>
+            <p id="form-status" role="status" aria-live="polite" class="hidden mb-4 rounded-2xl px-4 py-3 text-sm font-semibold text-center"></p>
+            <button id="submit-btn" type="submit"
+              class="btn-love w-full rounded-full bg-gradient-to-r from-blush-400 via-pink-500 to-purple-600 px-6 py-4 text-lg sm:text-xl font-bold text-white transition duration-200 focus:outline-none focus-visible:ring-4 focus-visible:ring-glow-300 disabled:opacity-70 disabled:cursor-wait">
+              <span id="btn-label">Send my answer 💌</span>
+            </button>
+            <p class="mt-3 text-center text-xs text-blush-200/70">Your answer goes straight to my inbox 💕</p>
+          </div>
+        </form>
+      </section>
+
+      <!-- Thank-you view -->
+      <section id="thanks-view" class="hidden text-center py-6">
+        <div class="text-6xl anim-pulse inline-block" aria-hidden="true">🥰</div>
+        <h2 class="mt-4 font-script text-4xl sm:text-5xl text-glow-300 glow-text">Yay! It's a date!</h2>
+        <p class="mt-4 text-blush-100/90 font-medium">Your answer has been sent. I can't wait! 💕</p>
+        <ul id="recap" class="mt-6 space-y-2 text-left rounded-2xl bg-white/10 border border-white/15 p-5 text-white font-semibold"></ul>
+        <p class="mt-6 text-3xl" aria-hidden="true">🍿 🧸 🎬 ✨ 🐰</p>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    (function () {
+      const form = document.getElementById('invite-form');
+      const radios = form.querySelectorAll('input[name="movie_choice"]');
+      const reveals = { 'reveal-yours': 'your_choice_title', 'reveal-hers': 'her_choice_title' };
+      const dateInput = document.getElementById('date_night_date');
+      const timeInput = document.getElementById('date_night_time');
+      const summary = document.getElementById('date-summary');
+      const statusEl = document.getElementById('form-status');
+      const submitBtn = document.getElementById('submit-btn');
+      const btnLabel = document.getElementById('btn-label');
+      const movieError = document.getElementById('movie-error');
+      const dateError = document.getElementById('date-error');
+
+      /* ----- Reveal "Your choice" / "Her choice" inputs ----- */
+      function updateReveals() {
+        const selected = form.querySelector('input[name="movie_choice"]:checked');
+        Object.keys(reveals).forEach(function (panelId) {
+          const panel = document.getElementById(panelId);
+          const input = document.getElementById(reveals[panelId]);
+          const open = selected && selected.dataset.reveal === panelId;
+          panel.classList.toggle('open', open);
+          panel.setAttribute('aria-hidden', String(!open));
+          input.disabled = !open;
+          input.required = open;
+          if (open) setTimeout(function () { input.focus({ preventScroll: true }); }, 250);
+        });
+        if (selected) movieError.classList.add('hidden');
+      }
+      radios.forEach(function (r) { r.addEventListener('change', updateReveals); });
+
+      /* ----- Calendar: min = today (local), live summary ----- */
+      function pad(n) { return String(n).padStart(2, '0'); }
+      const now = new Date();
+      dateInput.min = now.getFullYear() + '-' + pad(now.getMonth() + 1) + '-' + pad(now.getDate());
+
+      function prettyDate() {
+        if (!dateInput.value) return '';
+        const parts = dateInput.value.split('-').map(Number);
+        const d = new Date(parts[0], parts[1] - 1, parts[2]);
+        return d.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+      }
+      function updateSummary() {
+        const day = prettyDate();
+        if (!day) { summary.classList.add('hidden'); return; }
+        summary.textContent = '📅 ' + day + (timeInput.value ? ' at ' + timeInput.value : '') + ' 🍿';
+        summary.classList.remove('hidden');
+        dateError.classList.add('hidden');
+      }
+      dateInput.addEventListener('change', updateSummary);
+      dateInput.addEventListener('input', updateSummary);
+      timeInput.addEventListener('change', updateSummary);
+      timeInput.addEventListener('input', updateSummary);
+
+      /* ----- Helpers ----- */
+      function showStatus(msg, kind) {
+        statusEl.textContent = msg;
+        statusEl.className = 'mb-4 rounded-2xl px-4 py-3 text-sm font-semibold text-center ' +
+          (kind === 'error' ? 'bg-rose-500/25 border border-rose-300/40 text-rose-100'
+                            : 'bg-amber-400/20 border border-amber-200/40 text-amber-100');
+      }
+      function hideStatus() { statusEl.className = 'hidden'; }
+
+      function finalChoice() {
+        const selected = form.querySelector('input[name="movie_choice"]:checked');
+        if (!selected) return '';
+        const panelId = selected.dataset.reveal;
+        if (panelId) {
+          const title = document.getElementById(reveals[panelId]).value.trim();
+          return selected.value + ': ' + title;
+        }
+        return selected.value;
+      }
+
+      function burst() {
+        const emojis = ['💖', '💕', '🍿', '✨', '🧸', '🎬', '💗', '🐰'];
+        for (let i = 0; i < 36; i++) {
+          const s = document.createElement('span');
+          s.className = 'burst text-2xl sm:text-3xl';
+          s.textContent = emojis[i % emojis.length];
+          s.style.left = Math.random() * 100 + 'vw';
+          s.style.setProperty('--dx', (Math.random() * 160 - 80) + 'px');
+          s.style.setProperty('--rot', (Math.random() * 720 - 360) + 'deg');
+          s.style.setProperty('--dur', (2.8 + Math.random() * 2.2) + 's');
+          s.style.animationDelay = (Math.random() * 0.8) + 's';
+          document.body.appendChild(s);
+          setTimeout(function () { s.remove(); }, 6000);
+        }
+      }
+
+      function showThanks() {
+        const recap = document.getElementById('recap');
+        const rows = [
+          ['🎬', 'Watching', finalChoice()],
+          ['📅', 'When', prettyDate() + ' at ' + timeInput.value],
+          ['🌙', 'After', form.after_movie_plan.value],
+        ];
+        const note = form.message.value.trim();
+        if (note) rows.push(['💌', 'Note', note]);
+        recap.innerHTML = '';
+        rows.forEach(function (r) {
+          const li = document.createElement('li');
+          li.className = 'flex gap-3';
+          const icon = document.createElement('span'); icon.textContent = r[0];
+          const text = document.createElement('span');
+          const label = document.createElement('span'); label.className = 'text-blush-200'; label.textContent = r[1] + ': ';
+          text.appendChild(label); text.appendChild(document.createTextNode(r[2]));
+          li.appendChild(icon); li.appendChild(text);
+          recap.appendChild(li);
+        });
+        document.getElementById('invite-view').classList.add('hidden');
+        const thanks = document.getElementById('thanks-view');
+        thanks.classList.remove('hidden');
+        thanks.classList.add('pop-in');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        burst();
+      }
+
+      /* ----- Submit ----- */
+      form.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        hideStatus();
+
+        // Validate movie choice
+        const selected = form.querySelector('input[name="movie_choice"]:checked');
+        if (!selected) {
+          movieError.classList.remove('hidden');
+          movieError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          return;
+        }
+        if (selected.dataset.reveal) {
+          const titleInput = document.getElementById(reveals[selected.dataset.reveal]);
+          if (!titleInput.value.trim()) {
+            titleInput.focus();
+            titleInput.reportValidity();
+            return;
+          }
+        }
+        // Validate date/time
+        if (!dateInput.value || !timeInput.value || !dateInput.checkValidity()) {
+          dateError.textContent = dateInput.value && !dateInput.checkValidity()
+            ? 'Pick a day from today onwards 🗓️'
+            : 'Choose a day and time for our date 🗓️';
+          dateError.classList.remove('hidden');
+          dateInput.focus();
+          return;
+        }
+
+        document.getElementById('final_choice').value = finalChoice();
+
+        if (form.action.indexOf('YOUR_FORM_ID') !== -1) {
+          showStatus('💡 Form not connected yet — replace YOUR_FORM_ID in the form action with your Formspree form ID.', 'info');
+          return;
+        }
+
+        submitBtn.disabled = true;
+        btnLabel.textContent = 'Sending… 💫';
+        try {
+          const res = await fetch(form.action, {
+            method: 'POST',
+            body: new FormData(form),
+            headers: { Accept: 'application/json' },
+          });
+          if (res.ok) {
+            showThanks();
+          } else {
+            let msg = 'Oops, something went wrong. Please try again 🥺';
+            try {
+              const data = await res.json();
+              if (data && data.errors) msg = data.errors.map(function (x) { return x.message; }).join(', ');
+            } catch (_) {}
+            throw new Error(msg);
+          }
+        } catch (err) {
+          showStatus(err && err.message && err.message !== 'Failed to fetch'
+            ? err.message
+            : 'Could not send — check your connection and try again 🥺', 'error');
+          submitBtn.disabled = false;
+          btnLabel.textContent = 'Send my answer 💌';
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
