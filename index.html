@@ -311,20 +311,20 @@
               <!-- Option 3 -->
               <div>
                 <label class="block cursor-pointer">
-                  <input class="choice-input sr-only" type="radio" name="movie_choice" value="Your choice" data-reveal="reveal-yours" />
+                  <input class="choice-input sr-only" type="radio" name="movie_choice" value="Petar's choice" data-reveal="reveal-petar" />
                   <div class="choice-tile flex items-center gap-4 rounded-2xl border-2 border-white/20 bg-white/5 px-4 py-3.5 transition duration-200 hover:bg-white/10">
                     <span class="text-3xl" aria-hidden="true">🙋‍♂️</span>
                     <span class="flex-1">
-                      <span class="block font-bold text-white">Your choice</span>
+                      <span class="block font-bold text-white">Petar's choice</span>
                       <span class="block text-sm text-blush-200/90">Surprise me with your pick 🎁</span>
                     </span>
                     <span class="check-dot relative w-6 h-6 shrink-0 rounded-full border-2 border-white/50 transition"></span>
                   </div>
                 </label>
-                <div id="reveal-yours" class="reveal" aria-hidden="true">
+                <div id="reveal-petar" class="reveal" aria-hidden="true">
                   <div>
-                    <label for="your_choice_title" class="sr-only">Your movie pick</label>
-                    <input id="your_choice_title" name="your_choice_title" type="text" class="field" placeholder="Which movie should I pick? 🎥" disabled />
+                    <label for="petar_choice_title" class="sr-only">Petar's movie pick</label>
+                    <input id="petar_choice_title" name="petar_choice_title" type="text" class="field" placeholder="Which movie should Petar pick? 🎥" disabled />
                   </div>
                 </div>
               </div>
@@ -332,20 +332,20 @@
               <!-- Option 4 -->
               <div>
                 <label class="block cursor-pointer">
-                  <input class="choice-input sr-only" type="radio" name="movie_choice" value="Her choice" data-reveal="reveal-hers" />
+                  <input class="choice-input sr-only" type="radio" name="movie_choice" value="Desislava's choice" data-reveal="reveal-desislava" />
                   <div class="choice-tile flex items-center gap-4 rounded-2xl border-2 border-white/20 bg-white/5 px-4 py-3.5 transition duration-200 hover:bg-white/10">
                     <span class="text-3xl" aria-hidden="true">🙋‍♀️</span>
                     <span class="flex-1">
-                      <span class="block font-bold text-white">Her choice</span>
+                      <span class="block font-bold text-white">Desislava's choice</span>
                       <span class="block text-sm text-blush-200/90">You pick, I bring the snacks 🍫</span>
                     </span>
                     <span class="check-dot relative w-6 h-6 shrink-0 rounded-full border-2 border-white/50 transition"></span>
                   </div>
                 </label>
-                <div id="reveal-hers" class="reveal" aria-hidden="true">
+                <div id="reveal-desislava" class="reveal" aria-hidden="true">
                   <div>
-                    <label for="her_choice_title" class="sr-only">Her movie pick</label>
-                    <input id="her_choice_title" name="her_choice_title" type="text" class="field" placeholder="Tell me what you'd like to watch 💖" disabled />
+                    <label for="desislava_choice_title" class="sr-only">Desislava's movie pick</label>
+                    <input id="desislava_choice_title" name="desislava_choice_title" type="text" class="field" placeholder="Tell me what you'd like to watch 💖" disabled />
                   </div>
                 </div>
               </div>
@@ -418,7 +418,7 @@
     (function () {
       const form = document.getElementById('invite-form');
       const radios = form.querySelectorAll('input[name="movie_choice"]');
-      const reveals = { 'reveal-yours': 'your_choice_title', 'reveal-hers': 'her_choice_title' };
+      const reveals = { 'reveal-petar': 'petar_choice_title', 'reveal-desislava': 'desislava_choice_title' };
       const dateInput = document.getElementById('date_night_date');
       const timeInput = document.getElementById('date_night_time');
       const summary = document.getElementById('date-summary');
@@ -428,7 +428,7 @@
       const movieError = document.getElementById('movie-error');
       const dateError = document.getElementById('date-error');
 
-      /* ----- Reveal "Your choice" / "Her choice" inputs ----- */
+      /* ----- Reveal "Petar's choice" / "Desislava's choice" inputs ----- */
       function updateReveals() {
         const selected = form.querySelector('input[name="movie_choice"]:checked');
         Object.keys(reveals).forEach(function (panelId) {
