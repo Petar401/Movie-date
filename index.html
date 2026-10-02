@@ -266,11 +266,13 @@
           </p>
         </header>
 
-        <form id="invite-form" action="https://formspree.io/f/YOUR_FORM_ID" method="POST" class="mt-8 space-y-8" novalidate>
-          <!-- Formspree helpers -->
-          <input type="hidden" name="_subject" value="💌 New Movie Date Night answer!" />
+        <form id="invite-form" action="https://api.web3forms.com/submit" method="POST" class="mt-8 space-y-8" novalidate>
+          <!-- Web3Forms: paste your access key below (get one free at https://web3forms.com) -->
+          <input type="hidden" name="access_key" id="access_key" value="YOUR_ACCESS_KEY" />
+          <input type="hidden" name="subject" value="💌 New Movie Date Night answer!" />
+          <input type="hidden" name="from_name" value="Movie Date Night Invite" />
           <input type="hidden" name="final_choice" id="final_choice" value="" />
-          <input type="text" name="_gotcha" tabindex="-1" autocomplete="off" class="hidden" aria-hidden="true" />
+          <input type="checkbox" name="botcheck" tabindex="-1" autocomplete="off" class="hidden" style="display:none" aria-hidden="true" />
 
           <!-- Step 1: movie -->
           <fieldset>
@@ -562,8 +564,8 @@
 
         document.getElementById('final_choice').value = finalChoice();
 
-        if (form.action.indexOf('YOUR_FORM_ID') !== -1) {
-          showStatus('💡 Form not connected yet — replace YOUR_FORM_ID in the form action with your Formspree form ID.', 'info');
+        if (document.getElementById('access_key').value === 'YOUR_ACCESS_KEY') {
+          showStatus('💡 Form not connected yet — replace YOUR_ACCESS_KEY with your Web3Forms access key.', 'info');
           return;
         }
 
@@ -575,15 +577,12 @@
             body: new FormData(form),
             headers: { Accept: 'application/json' },
           });
-          if (res.ok) {
+          let data = null;
+          try { data = await res.json(); } catch (_) {}
+          if (res.ok && (!data || data.success !== false)) {
             showThanks();
           } else {
-            let msg = 'Oops, something went wrong. Please try again 🥺';
-            try {
-              const data = await res.json();
-              if (data && data.errors) msg = data.errors.map(function (x) { return x.message; }).join(', ');
-            } catch (_) {}
-            throw new Error(msg);
+            throw new Error((data && data.message) || 'Oops, something went wrong. Please try again 🥺');
           }
         } catch (err) {
           showStatus(err && err.message && err.message !== 'Failed to fetch'
